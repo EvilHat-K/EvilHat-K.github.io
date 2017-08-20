@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>EvilHat -- A Simple Blog</title>
+    <link>http://evilhat-k.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/index.xml</link>
+    <description>Recent content on EvilHat -- A Simple Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <atom:link href="http://evilhat-k.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>无限制文件上传测试</title>
+      <link>http://evilhat-k.github.io/post/Unrestricted-File-Upload/</link>
+      <pubDate>Tue, 27 Dec 2016 23:29:20 +0800</pubDate>
+      
+      <guid>http://evilhat-k.github.io/post/Unrestricted-File-Upload/</guid>
+      <description>
+
+&lt;h3 id=&#34;什么是无线无限制文件上传&#34;&gt;什么是无线无限制文件上传?&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;存在漏洞的上传功能允许攻击者绕过输入控制,上传payload并可以潜在地执行命令&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;没有正确控制或验证过滤用户上传的文件的web应用,将有可能造成无 限制文件上传漏洞. 本文档概述了在执行Web应用程序渗透测试时文件上传功能的测试过程。这篇文章包含绕过文件上传黑名单过滤的各种技术，并总结了一个有用的检查列表&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&#34;识别文件上传功能&#34;&gt;识别文件上传功能&lt;/h3&gt;
+
+&lt;p&gt;文件上传功能可以说是既容易识别也容易利用. 典型的地方是在个人资料的头像上传,文档上传功能和文件导入功能处. 在Burp中, 它也会被动的识别文件上传点&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&#34;使用burp-intruder测试无限制文件上传&#34;&gt;使用Burp Intruder测试无限制文件上传&lt;/h3&gt;
+
+&lt;p&gt;Web应用经常使用黑名单列表来验证和过滤输入的文件,可以说是正常但也是不足的. 如果一个文件的拓展名不在黑名单列表内,那攻击者就可以绕过这个过滤. 所以输入验证的首选机制是输入白名单, 它使用 &amp;ldquo;拒绝其他全部&amp;rdquo; 的方法, 只允许需要的输入.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h4 id=&#34;burp测试文件上传拓展&#34;&gt;Burp测试文件上传拓展&lt;/h4&gt;
+
+&lt;ol&gt;
+&lt;li&gt;手动上传一个可能会导致上传失败的文件, 找到可用于标识Web应用程序拒绝文件扩展名的响应。&lt;/li&gt;
+&lt;li&gt;发送这个上传请求到 Burp intruder&lt;/li&gt;
+&lt;li&gt;清除默认的变量标记点&lt;/li&gt;
+&lt;li&gt;选择文件拓展名为变量标记点&lt;/li&gt;
+&lt;li&gt;选择包含各个拓展名的payload,如php,jpg,gif等等&lt;/li&gt;
+&lt;li&gt;在选项配置中使用 grep-match 来匹配步骤1中用于表示失败响应的字符串&lt;/li&gt;
+&lt;li&gt;点击Start attack. 在结果窗口中匹配结果未打勾的都可能是漏洞点,需要进一步检查并确认任何发现&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;关键点:
+1. 使用Burp Intruder测试所有扩展名,并使用Grep功能对结果进行排序
+2. 使用可能绕过黑名单列表的非常见文件扩展名，例如: .php3, .php5, .phtml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;h4 id=&#34;测试文件上传的content-type&#34;&gt;测试文件上传的Content-Type&lt;/h4&gt;
+
+&lt;p&gt;识别目标可接受的文件上传 Content-Type&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;建立一个基线 &amp;ndash; 使用一个已知可接受的 Content-Type并查看应用的响应内容, 同样的使用一个可能失败的Content-Type并查看响应的内容,这个主要用于步骤 6 中&lt;/li&gt;
+&lt;li&gt;发送上传请求到 Burp intruder&lt;/li&gt;
+&lt;li&gt;清除默认的变量标记点&lt;/li&gt;
+&lt;li&gt;选择 &amp;ldquo;Content-Type:&amp;rdquo; 头为变量标记点&lt;/li&gt;
+&lt;li&gt;选择一个包含Content-Type的payload列表&lt;/li&gt;
+&lt;li&gt;在选择配置选项中使用 grep-match来匹配步骤1中用于表示失败响应的字符串&lt;/li&gt;
+&lt;li&gt;点击Start attck. 在结果窗口中匹配结果未打勾的都可能是漏洞点,需要进一步检查并确认任何发现&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code&gt;关键点:
+1. 使用Burp Intruder测试所有Content-Type,并使用Grep功能对结果进行排序
+2. 尝试改变Content-Type为一个可接受,且web服务或应用会处理的拓展名 (这里没理解什么意思)
+3. 尝试可能绕过黑名单列表的非常见Content-Type
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;h4 id=&#34;文件名和拓展名的fuzzing&#34;&gt;文件名和拓展名的Fuzzing&lt;/h4&gt;
+
+&lt;p&gt;在输入验证时还应该测试文件名和拓展名,如果文件名是一个XSS, SQLI, LDAP或者命令注入payload时会发生什么?&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;手动上传一个可能会被上传应用验证过滤的失败文件,找到一个可以用于识别Web应用程序拒绝的文件拓展名的响应标识&lt;/li&gt;
+&lt;li&gt;发送上传请求到Burp Intruder&lt;/li&gt;
+&lt;li&gt;清楚默认的变量标记点&lt;/li&gt;
+&lt;li&gt;选择文件名或者拓展名为变量标记点&lt;/li&gt;
+&lt;li&gt;选择一个包含各种注入的payload [如:js,XSS,CMD,LDAP,Xpath,SQL等等]&lt;/li&gt;
+&lt;li&gt;在选择配置选项中使用 grep-match来匹配步骤1中用于表示失败响应的字符串&lt;/li&gt;
+&lt;li&gt;点击Start attack, 在结果窗口中匹配结果未打勾的都可能是漏洞点&lt;/li&gt;
+&lt;li&gt;验证确认发现的可能漏洞&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&#34;文件上传黑名单绕过技术&#34;&gt;文件上传黑名单绕过技术&lt;/h3&gt;
+
+&lt;h4 id=&#34;windows-iis-server黑名单文件上传绕过&#34;&gt;Windows IIS Server黑名单文件上传绕过:&lt;/h4&gt;
+
+&lt;ol&gt;
+&lt;li&gt;上传以黑名单列表中的拓展名后加分号的文件名,例如: &lt;strong&gt;shell.asp;.jpg&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;创建一个.asp拓展的目录,然后在该目录下上传一个允许上传的文件名,例如: &lt;strong&gt;folder.asp\file.txt&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

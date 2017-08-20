@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>EvilHat -- A Simple Blog</title>
+    <link>http://evilhat-k.github.io/tags/%E7%BC%96%E7%A8%8B/index.xml</link>
+    <description>Recent content on EvilHat -- A Simple Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <atom:link href="http://evilhat-k.github.io/tags/%E7%BC%96%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Python学习记录_2</title>
+      <link>http://evilhat-k.github.io/post/py-study-2/</link>
+      <pubDate>Sat, 11 Feb 2017 22:51:29 +0800</pubDate>
+      
+      <guid>http://evilhat-k.github.io/post/py-study-2/</guid>
+      <description>&lt;ul&gt;
+&lt;li&gt;最近在使用whatweb的时候经常输出到json格式的文件, 于是就写了一个简单的json解析的脚本&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python
+# -*-coding:utf8 -*-
+
+import json, sys
+
+if(len(sys.argv) == 1):
+    print &#39;Usage: python json_parse.py jsonfile&#39;
+    quit()
+
+json_file = sys.argv[1]
+f = open(json_file)
+f = json.load(f) #这里注意下, 如果是从文件里读取json数据, 那么这里应该用load方法, 如果是字符就用loads 
+for num in f:
+    try:
+        target =  num[&#39;target&#39;]  #防止某些数据没有值导致输出不完整
+    except Exception, e:
+        target = &#39;&#39;
+
+    try:
+    	ip = num[&#39;plugins&#39;][&#39;IP&#39;][&#39;string&#39;][0]
+    except Exception, e:
+    	ip = &#39;&#39;
+
+    try:
+    	httpserver = num[&#39;plugins&#39;][&#39;HTTPServer&#39;][&#39;string&#39;][0]
+    except Exception, e:
+    	httpserver = &#39;&#39;
+
+    print target+&#39;,&#39;+ip+&#39;,&#39;+httpserver
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Python学习记录_1</title>
+      <link>http://evilhat-k.github.io/post/py-study/</link>
+      <pubDate>Fri, 23 Dec 2016 00:08:56 +0800</pubDate>
+      
+      <guid>http://evilhat-k.github.io/post/py-study/</guid>
+      <description>&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;最近开始&amp;rdquo;真正&amp;rdquo;接触Python了,也是计划中的一步,毕竟Python在网络安全中的应用能力还是很强大的. 估摸着以后会经常接触到一些需要自动化的情况,或为了实现我想做的.怎么说都要学好,哈哈&amp;hellip;&amp;hellip;OK!废话不多说,Python的优点不再多说,反正网上搜一大堆:(&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;我的计划大概是这样的.把每次学习的最后代码(带注释)贴出来.不论代码如何,是好是坏. 也算是记录了我的学习历程吧!&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;下面贴上代码&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python
+#-*- coding:utf-8 -*- #声明编码方式,不然中文会报错
+
+import socket
+import sys
+
+#输出几行test,没列颜色不同
+def printest():
+    for i in range(2):
+        for j in (2):
+            print &amp;quot;\033[0;32m| Test1\033[0m&amp;quot;+&amp;quot; | &amp;quot;+&amp;quot;\033[0;33mTest2\033[0m&amp;quot;+&amp;quot; | &amp;quot;+&amp;quot;\033[0;34mTest3\033[0m&amp;quot;+&amp;quot;\n&amp;quot;
+
+
+#以下根据输入的行数输出金字塔
+def star():
+    try:
+        line = raw_input(&amp;quot;请输入金字塔的高度(太高就炸了):&amp;quot;)
+        line = int(line)+1
+    except Exception, e: #要捕获异常,不然异常会直接输出
+        print &amp;quot;请输入整数!&amp;quot;
+        exit()
+    i = 0
+    for i in range(line):
+        blank = line - i
+        star = (i-1)*2+1
+        print &amp;quot; &amp;quot;*blank + &amp;quot;*&amp;quot;*star# + &amp;quot;\n&amp;quot;
+
+
+#banner和文件里的信息对比
+def bannercmp(banner):
+    bfile = open(&amp;quot;test.txt&amp;quot;,&amp;quot;r&amp;quot;)
+    for line in bfile:
+        if line.strip(&amp;quot;\n&amp;quot;) in banner:
+            print &#39;Found vulnerable:&#39;+banner.strip(&amp;quot;\n&amp;quot;)
+        else:
+            print &amp;quot;Not Found Vulnerable&amp;quot;
+
+
+#网络socket,简单获取banner
+def socketest(host,port):
+    socket.setdefaulttimeout(5)  #设置默认超时时间
+    s = socket.socket()
+    try:
+        s.connect((host,port))
+    except Exception, e:
+        print &amp;quot;[-]Error = &amp;quot;+str(e) #设置异常处理
+        exit()
+    banner = s.recv(1024)
+    print &amp;quot;Extract Port Banner -&amp;gt;&amp;gt; &amp;quot;+banner
+
+
+#定义帮助信息函数
+def usageinfo():
+    print &amp;quot;&amp;quot;&amp;quot;
+    Usage:
+    script.py star                    输出金字塔
+              socket [host] [port]    获取banner信息
+
+&amp;quot;&amp;quot;&amp;quot;
+
+def main():
+    #str = type(sys.argv)  #sys.argv获取数据类型为list.记录sys.argv[0]一直都是脚本名本身
+    if len(sys.argv) &amp;lt; 2:
+        usageinfo()
+        exit()
+    if sys.argv[1].strip() == &#39;star&#39;:
+        star()
+        exit()
+    elif sys.argv[1].strip() == &#39;socket&#39;:
+        try:
+           host = sys.argv[2]
+           port = int(sys.argv[3]) #传入的是字符类型,需要转为整数型,不然connect时会报错
+        except Exception,e:
+           print &amp;quot;Please Provide Host and port&amp;quot;
+           exit()
+        socketest(host,port)
+        exit()
+
+    usageinfo()
+
+
+if __name__ == &#39;__main__&#39;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

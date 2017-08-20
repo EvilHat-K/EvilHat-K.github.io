@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>EvilHat -- A Simple Blog</title>
+    <link>http://evilhat-k.github.io/categories/%E9%9A%8F%E8%A8%80/index.xml</link>
+    <description>Recent content on EvilHat -- A Simple Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <atom:link href="http://evilhat-k.github.io/categories/%E9%9A%8F%E8%A8%80/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>随便说说</title>
+      <link>http://evilhat-k.github.io/post/SaySome/</link>
+      <pubDate>Thu, 15 Dec 2016 22:54:29 +0800</pubDate>
+      
+      <guid>http://evilhat-k.github.io/post/SaySome/</guid>
+      <description>&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;第一次用hugo写文章,其实心里也是挺忐忑的,不知道这次能不能坚持写下去,以前好几个博客都夭折了!!&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;一如既往的在博客开始&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;希望可以坚持下去&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;先定一个小目标&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;博客写了10篇文章&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

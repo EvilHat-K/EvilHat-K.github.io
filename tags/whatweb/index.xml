@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>EvilHat -- A Simple Blog</title>
+    <link>http://evilhat-k.github.io/tags/whatweb/index.xml</link>
+    <description>Recent content on EvilHat -- A Simple Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <atom:link href="http://evilhat-k.github.io/tags/whatweb/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Python学习记录_2</title>
+      <link>http://evilhat-k.github.io/post/py-study-2/</link>
+      <pubDate>Sat, 11 Feb 2017 22:51:29 +0800</pubDate>
+      
+      <guid>http://evilhat-k.github.io/post/py-study-2/</guid>
+      <description>&lt;ul&gt;
+&lt;li&gt;最近在使用whatweb的时候经常输出到json格式的文件, 于是就写了一个简单的json解析的脚本&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python
+# -*-coding:utf8 -*-
+
+import json, sys
+
+if(len(sys.argv) == 1):
+    print &#39;Usage: python json_parse.py jsonfile&#39;
+    quit()
+
+json_file = sys.argv[1]
+f = open(json_file)
+f = json.load(f) #这里注意下, 如果是从文件里读取json数据, 那么这里应该用load方法, 如果是字符就用loads 
+for num in f:
+    try:
+        target =  num[&#39;target&#39;]  #防止某些数据没有值导致输出不完整
+    except Exception, e:
+        target = &#39;&#39;
+
+    try:
+    	ip = num[&#39;plugins&#39;][&#39;IP&#39;][&#39;string&#39;][0]
+    except Exception, e:
+    	ip = &#39;&#39;
+
+    try:
+    	httpserver = num[&#39;plugins&#39;][&#39;HTTPServer&#39;][&#39;string&#39;][0]
+    except Exception, e:
+    	httpserver = &#39;&#39;
+
+    print target+&#39;,&#39;+ip+&#39;,&#39;+httpserver
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

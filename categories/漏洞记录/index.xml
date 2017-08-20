@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>EvilHat -- A Simple Blog</title>
+    <link>http://evilhat-k.github.io/categories/%E6%BC%8F%E6%B4%9E%E8%AE%B0%E5%BD%95/index.xml</link>
+    <description>Recent content on EvilHat -- A Simple Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <atom:link href="http://evilhat-k.github.io/categories/%E6%BC%8F%E6%B4%9E%E8%AE%B0%E5%BD%95/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Cgiemail漏洞记录</title>
+      <link>http://evilhat-k.github.io/post/cgiemail-exploit/</link>
+      <pubDate>Sat, 17 Dec 2016 19:07:18 +0800</pubDate>
+      
+      <guid>http://evilhat-k.github.io/post/cgiemail-exploit/</guid>
+      <description>&lt;p&gt;最近在测试的过程中,记录了一个应用的漏洞,这个应用通常用在了cpanel(虚拟主机管理面板).这次碰到了就记录一下吧,免得以后又忘记了.&lt;/p&gt;
+
+&lt;p&gt;cgiemail的作用简单说就是通过webcgi的方式来发送email,具体的这里不多赘述.想了解的到 &lt;a href=&#34;http://web.mit.edu/wwwdev/cgiemail/&#34;&gt;项目地址&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;现在我找到的关于这个程序的2个漏洞&lt;br /&gt;
+  1. &lt;a href=&#34;https://www.exploit-db.com/exploits/21998/&#34;&gt;CGIEmail 1.6 - 远程缓冲区溢出&lt;/a&gt;&lt;br /&gt;
+  2. &lt;a href=&#34;https://www.exploit-db.com/exploits/40571&#34;&gt;CGIEmail 1.6 - 源代码泄露&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+&lt;ul&gt;
+&lt;li&gt;先说下这个缓冲区溢出吧.具体的细节我也不太清楚,因为现在对缓冲区溢出这方面还不太了解,也不敢来分析什么的.以后接触到了可以拿来分析看看吧.&lt;br /&gt;
+&amp;gt; 这个缓冲区漏洞问题出现在 &lt;strong&gt;cgicso&lt;/strong&gt; 中,这个是cgiemail编译后生成的4个文件之一.应该这个漏洞的披露时间是2001年左右,比较老了.现在很少会出现这个漏洞了.但是可以在测试的时候也尝试下.&lt;br /&gt;
+&amp;gt; 通常这个程序用于流行的虚拟主机管理面板 cpanel中,在测试的时候,随便找一个使用这个虚拟主机机器的站点,在url后面加上 /cgi-sys/cgicso 或者 /cgi-bin/cgicso 一般都是这2个访问点.只要返回的信息不是没有这个程序,就说明 &lt;strong&gt;存在该文件&lt;/strong&gt; 因为这个漏洞现在几乎找不到了,我也没有找到例子,只能通过网上的资料来写.&lt;br /&gt;
+&amp;gt; 在确人了该程序存在后,如果要利用这个漏洞还有一个前提条件.就是目标服务是否允许请求到远程主机. 可以发送一个GET请求来测试.&lt;a href=&#34;https://tools.cisco.com/security/center/viewAlert.x?alertId=5012&#34;&gt;参考&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;GET /cgi-sys/cgisco?fingerhost=A&amp;amp;query=AAA&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;ul&gt;
+&lt;li&gt;接下来讲下源代码泄露这个漏洞.漏洞出现在cgiecho中,url访问点依旧和上面说的一样,不是/cgi-bin/ 就是 /cgi-sys/. 本来这个程序的作用是用于把email模板和传入的参数值输出到页面上,便于查看 &lt;a href=&#34;http://web.mit.edu/wwwdev/cgiemail/user.html#cgiecho&#34;&gt;官网介绍&lt;/a&gt;&lt;br /&gt;
+&amp;gt; 但是它没有对传入email模板文件进行限制,导致我们可以传入当前站点根目录的任意一个文件作为email模板文件, 但是仅仅传入文件名,并不会泄露文件的内容.我们可以看看官网给的一个email模板文件的&lt;a href=&#34;http://web.mit.edu/wwwdev/cgiemail/questions3.txt&#34;&gt;例子&lt;/a&gt;&lt;br /&gt;
+&lt;img src=&#34;http://evilhat-k.github.io/images/20161217/cgiemail-1.png&#34; alt=&#34;email模板例子&#34; /&gt;&lt;br /&gt;
+&amp;gt; 通过说明和例子可以知道,如果要正常输出email文件的内容,除了文件要存在,还要传入一个 &lt;strong&gt;参数&lt;/strong&gt; 这个参数就是例子中用方括号包起来的字符 [email],[yourname],[quest],[colour].如果我们提交了如下请求,那么文件的内容就会输出,而方括号里的内容就会被传入的对应值填充 &lt;br &gt;
+&lt;strong&gt;GET /cgi-sys/cgiecho/test.txt?email=demo&lt;/strong&gt;&lt;br /&gt;
+&amp;gt; 这时候页面就输出文件的内容了.&lt;br /&gt;
+&amp;gt; 注意:传入的参数必须和文件里方括号里的内容一致,如果文件里是 [&amp;lsquo;email&amp;rsquo;]这种,在请求里也要对应为?&amp;lsquo;email&amp;rsquo;=test.传入的值随意,只要不为空就可以. 这里test.txt对应的位置就是站点的根目录位置,如果文件在比如 demo/这个目录,同样加上目录/cgiecho/demo/test.txt就可以了.&lt;br /&gt;
+&amp;gt; 知道了问题的原因和利用的条件,就可以去利用了. 这个漏洞有一点就是很坑,要成功利用,需要文件里有中括号包含的内容,就是有中括号,但是中括号里的内容就要靠猜了.不过通常的知道传入的参数还是挺好猜的,或者全站爬行一遍,就能找到很多参数了.注意:利用成功后会输出文件的内容,但其他包含中括号的内容如果没有猜解到,则会返回空.比如文件内有$str[&amp;lsquo;te&amp;rsquo;]和$str[&amp;rsquo;s&amp;rsquo;],如果传入test.php?&amp;lsquo;te&amp;rsquo;=[&amp;lsquo;te123&amp;rsquo;],那么就会返回$str[&amp;lsquo;te123&amp;rsquo;]和$str. 后面那个中括号里的内容就消失了,因为没有赋值.&lt;br /&gt;
+&amp;gt; 这里附上个老外写的利用脚本 &lt;a href=&#34;https://github.com/finbar-crago/cgiemail-exploit&#34;&gt;https://github.com/finbar-crago/cgiemail-exploit&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
